@@ -17,6 +17,10 @@ pub fn parse(input: String) -> Vec<Vec<u32>> {
     batches
 }
 
+pub fn maximum_elf_calories(batch_calories: Vec<Vec<u32>>) -> u32 {
+    0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -36,6 +40,17 @@ mod tests {
             vec!(7000, 8000, 9000),
             vec!(10000));
         assert_eq!(parse(input), expected);
+    }
+
+    #[test]
+    fn finds_maximum_elf_calories() {
+        let calories = vec!(
+            vec!(1000, 2000, 3000),
+            vec!(4000),
+            vec!(5000, 6000),
+            vec!(7000, 8000, 9000),
+            vec!(10000));
+        assert_eq!(maximum_elf_calories(calories), 24_000);
     }
 }
 
