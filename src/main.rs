@@ -30,6 +30,12 @@ pub fn maximum_elf_calories(batches: Vec<Vec<u32>>) -> u32 {
     elf_max
 }
 
+pub fn top_three_sum(batches: Vec<Vec<u32>>) -> u32 {
+    let mut totals = batches.iter().map(|batch| batch.iter().sum()).collect::<Vec<u32>>();
+    totals.sort_by(|a, b| b.cmp(a));
+    totals[0] + totals[1] + totals[2]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -60,6 +66,16 @@ mod tests {
             vec!(7000, 8000, 9000),
             vec!(10000));
         assert_eq!(maximum_elf_calories(calories), 24_000);
+    }
+
+    #[test]
+    fn finds_top_three_sum() {
+        let calories = vec!(
+            vec!(23, 55),
+            vec!(14),
+            vec!(101),
+            vec!(30));
+        assert_eq!(top_three_sum(calories), 30+23+55+101);
     }
 }
 
