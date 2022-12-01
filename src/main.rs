@@ -1,5 +1,20 @@
-pub fn parse(_input: String) -> Vec<Vec<u16>> {
-    vec!()
+pub fn parse(input: String) -> Vec<Vec<u16>> {
+    let mut batches = Vec::new();
+    let mut current: Vec<u16> = Vec::new();
+    for line in input.split("\n") {
+        if line.trim().len() == 0 {
+            if current.len() > 0 {
+                batches.push(current);
+                current = Vec::new();
+            }
+        } else {
+            current.push(line.parse::<u16>().unwrap());
+        }
+    }
+    if current.len() > 0 {
+        batches.push(current);
+    }
+    batches
 }
 
 #[cfg(test)]
@@ -9,7 +24,7 @@ mod tests {
     #[test]
     fn it_parses() {
         let input = format!("{}{}{}{}{}",
-                    "1000\n2000\n3000\n",
+                    "1000\n2000\n3000\n\n",
                     "4000\n\n",
                     "5000\n6000\n\n",
                     "7000\n8000\n9000\n\n",
