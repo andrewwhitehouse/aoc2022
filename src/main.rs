@@ -83,5 +83,6 @@ fn main() {
     let input = fs::read_to_string("day1.txt")
         .expect("failed to read day1 input");
     let batches = parse(input);
-    println!("Day 1 Part 1 {}", maximum_elf_calories(batches));
+    println!("Day 1 Part 1 {}", maximum_elf_calories(batches.clone()));
+    println!("Day 1 Part 2 {}", top_three_sum(batches));
 }
