@@ -17,8 +17,15 @@ pub fn parse(input: String) -> Vec<Vec<u32>> {
     batches
 }
 
-pub fn maximum_elf_calories(batch_calories: Vec<Vec<u32>>) -> u32 {
-    0
+pub fn maximum_elf_calories(batches: Vec<Vec<u32>>) -> u32 {
+    let mut elf_max = 0u32;
+    for batch in batches.iter() {
+        let total = batch.iter().sum();
+        if total > elf_max {
+            elf_max = total;
+        }
+    }
+    elf_max
 }
 
 #[cfg(test)]
