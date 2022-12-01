@@ -1,6 +1,6 @@
-pub fn parse(input: String) -> Vec<Vec<u16>> {
+pub fn parse(input: String) -> Vec<Vec<u32>> {
     let mut batches = Vec::new();
-    let mut current: Vec<u16> = Vec::new();
+    let mut current: Vec<u32> = Vec::new();
     for line in input.split("\n") {
         if line.trim().len() == 0 {
             if current.len() > 0 {
@@ -8,7 +8,7 @@ pub fn parse(input: String) -> Vec<Vec<u16>> {
                 current = Vec::new();
             }
         } else {
-            current.push(line.parse::<u16>().unwrap());
+            current.push(line.parse::<u32>().unwrap());
         }
     }
     if current.len() > 0 {
