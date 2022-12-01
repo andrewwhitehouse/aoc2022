@@ -1,7 +1,9 @@
+use std::fs;
+
 pub fn parse(input: String) -> Vec<Vec<u32>> {
     let mut batches = Vec::new();
     let mut current: Vec<u32> = Vec::new();
-    for line in input.split("\n") {
+    for line in input.trim_end().split("\n") {
         if line.trim().len() == 0 {
             if current.len() > 0 {
                 batches.push(current);
@@ -62,5 +64,8 @@ mod tests {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let input = fs::read_to_string("day1.txt")
+        .expect("failed to read day1 input");
+    let batches = parse(input);
+    println!("Day 1 Part 1 {}", maximum_elf_calories(batches));
 }
