@@ -1,3 +1,5 @@
+use std::fs;
+
 pub fn parse(input: String) -> Vec<Vec<u32>> {
     let mut batches = Vec::new();
     let mut current: Vec<u32> = Vec::new();
@@ -26,15 +28,6 @@ pub fn max_sum(batches: Vec<Vec<u32>>) -> u32 {
         }
     }
     max
-}
-
-pub fn top_three_sum(batches: Vec<Vec<u32>>) -> u32 {
-    let mut totals = batches
-        .iter()
-        .map(|batch| batch.iter().sum())
-        .collect::<Vec<u32>>();
-    totals.sort_by(|a, b| b.cmp(a));
-    totals[0] + totals[1] + totals[2]
 }
 
 #[cfg(test)]
@@ -70,5 +63,7 @@ mod tests {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let input = fs::read_to_string("input/day1.txt").expect("failed to read day1 input");
+    let batches = parse(input);
+    println!("Day 1 Part 1 {}", max_sum(batches));
 }
