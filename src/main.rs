@@ -1,5 +1,3 @@
-use std::fs;
-
 pub fn parse(input: String) -> Vec<Vec<u32>> {
     let mut batches = Vec::new();
     let mut current: Vec<u32> = Vec::new();
@@ -19,15 +17,15 @@ pub fn parse(input: String) -> Vec<Vec<u32>> {
     batches
 }
 
-pub fn maximum_elf_calories(batches: Vec<Vec<u32>>) -> u32 {
-    let mut elf_max = 0u32;
-    for batch in batches.iter() {
-        let total = batch.iter().sum();
-        if total > elf_max {
-            elf_max = total;
+pub fn max_sum(batches: Vec<Vec<u32>>) -> u32 {
+    let mut max = 0u32;
+    for batch in batches {
+        let batch_sum = batch.iter().sum();
+        if batch_sum > max {
+            max = batch_sum;
         }
     }
-    elf_max
+    max
 }
 
 pub fn top_three_sum(batches: Vec<Vec<u32>>) -> u32 {
@@ -60,27 +58,17 @@ mod tests {
     }
 
     #[test]
-    fn finds_maximum_elf_calories() {
-        let calories = vec![
-            vec![1000, 2000, 3000],
-            vec![4000],
-            vec![5000, 6000],
-            vec![7000, 8000, 9000],
-            vec![10000],
-        ];
-        assert_eq!(maximum_elf_calories(calories), 24_000);
-    }
-
-    #[test]
-    fn finds_top_three_sum() {
-        let calories = vec![vec![23, 55], vec![14], vec![101], vec![30]];
-        assert_eq!(top_three_sum(calories), 30 + 23 + 55 + 101);
+    fn find_max_sum() {
+        let batches = vec!(
+            vec!(1000, 2000, 3000),
+            vec!(4000),
+            vec!(5000, 6000),
+            vec!(7000, 8000, 9000),
+            vec!(10000));
+        assert_eq!(max_sum(batches), 24_000);
     }
 }
 
 fn main() {
-    let input = fs::read_to_string("day1.txt").expect("failed to read day1 input");
-    let batches = parse(input);
-    println!("Day 1 Part 1 {}", maximum_elf_calories(batches.clone()));
-    println!("Day 1 Part 2 {}", top_three_sum(batches));
+    println!("Hello, world!");
 }
