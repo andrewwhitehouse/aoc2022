@@ -82,5 +82,6 @@ mod tests {
 fn main() {
     let input = fs::read_to_string("input/day1.txt").expect("failed to read day1 input");
     let batches = parse(input);
-    println!("Day 1 Part 1 {}", max_sum(batches));
+    println!("Day 1 Part 1 {}", max_sum(batches.clone()));
+    println!("Day 1 Part 2 {}", sum_of_top_three(batches));
 }
