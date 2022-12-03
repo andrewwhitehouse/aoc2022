@@ -61,6 +61,62 @@ pub fn parse(input: String) -> Vec<PlayerChoice> {
     player_choices
 }
 
+#[derive(PartialEq, Debug)]
+pub enum Outcome {
+    WIN,
+    LOSE,
+    DRAW
+}
+
+#[derive(PartialEq, Debug)]
+pub struct StrategyPart2 {
+    opponent_choice: Choice,
+    desired_outcome: Outcome
+}
+
+pub fn parse_part2(input: String) -> Vec<StrategyPart2> {
+    let mut outcomes = Vec::new();
+    for line in input.trim_end().split("\n") {
+        let mut single_strategy = line.split(" ");
+        let opponent_choice = match single_strategy.next() {
+            Some("A") => Choice::ROCK,
+            Some("B") => Choice::PAPER,
+            Some("C") => Choice::SCISSORS,
+            Some(&_) => todo!(),
+            None => todo!()
+        };
+        let desired_outcome = match single_strategy.next() {
+            Some("X") => Outcome::LOSE,
+            Some("Y") => Outcome::DRAW,
+            Some("Z") => Outcome::WIN,
+            Some(&_) => todo!(),
+            None => todo!()
+        };
+        outcomes.push(StrategyPart2{opponent_choice: opponent_choice, desired_outcome: desired_outcome});
+    }
+    outcomes
+}
+
+pub fn required_choice(opponent_choice: Choice, desired_outcome: Outcome) -> Choice {
+    match desired_outcome {
+        Outcome::LOSE => {
+            match opponent_choice {
+                Choice::ROCK => Choice::SCISSORS,
+                Choice::PAPER => Choice::ROCK,
+                Choice::SCISSORS => Choice::PAPER
+            }
+        },
+        Outcome::DRAW => opponent_choice,
+        Outcome::WIN => {
+            match opponent_choice {
+                Choice::ROCK => Choice::PAPER,
+                Choice::PAPER => Choice::SCISSORS,
+                Choice::SCISSORS => Choice::ROCK
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod day2_tests {
     use super::*;
@@ -119,5 +175,31 @@ mod day2_tests {
         for i in 0..result.len() {
             assert_eq!(expected[i], result[i]);
         }
+    }
+
+    #[test]
+    fn test_parse_part2() {
+        let input = "A Y\nB X\nC Z";
+        let expected = vec!(StrategyPart2{opponent_choice: Choice::ROCK, desired_outcome: Outcome::DRAW},
+                            StrategyPart2{opponent_choice: Choice::PAPER, desired_outcome: Outcome::LOSE},
+                            StrategyPart2{opponent_choice: Choice::SCISSORS, desired_outcome: Outcome::WIN});
+        let result = parse_part2(String::from(input));
+        assert_eq!(expected.len(), result.len());
+        for i in 0..result.len() {
+            assert_eq!(expected[i], result[i]);
+        }
+    }
+
+    #[test]
+    fn test_required_choice_for_outcome() {
+        assert_eq!(required_choice(Choice::ROCK, Outcome::WIN), Choice::PAPER);
+        assert_eq!(required_choice(Choice::ROCK, Outcome::DRAW), Choice::ROCK);
+        assert_eq!(required_choice(Choice::ROCK, Outcome::LOSE), Choice::SCISSORS);
+        assert_eq!(required_choice(Choice::PAPER, Outcome::WIN), Choice::SCISSORS);
+        assert_eq!(required_choice(Choice::PAPER, Outcome::DRAW), Choice::PAPER);
+        assert_eq!(required_choice(Choice::PAPER, Outcome::LOSE), Choice::ROCK);
+        assert_eq!(required_choice(Choice::SCISSORS, Outcome::WIN), Choice::ROCK);
+        assert_eq!(required_choice(Choice::SCISSORS, Outcome::DRAW), Choice::SCISSORS);
+        assert_eq!(required_choice(Choice::SCISSORS, Outcome::LOSE), Choice::PAPER);
     }
 }
