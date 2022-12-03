@@ -10,6 +10,13 @@ fn solve_day1() {
     println!("Day 1 Part 2 {}", day1::sum_of_top_three(batches));
 }
 
+fn solve_day2() {
+    let input = fs::read_to_string("input/day2.txt").expect("failed to read day1 input");
+    let choices = day2::parse(input);
+    println!("Day 2 Part 1 {}", day2::game_score(choices));
+}
+
 pub fn main() {
     solve_day1();
+    solve_day2();
 }
