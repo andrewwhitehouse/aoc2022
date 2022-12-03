@@ -35,7 +35,7 @@ pub fn sum_of_top_three(batches: Vec<Vec<u32>>) -> u32 {
 }
 
 #[cfg(test)]
-mod tests {
+mod day1_tests {
     use super::*;
 
     #[test]

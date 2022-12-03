@@ -1,7 +1,8 @@
-enum Choice {
-    ROCK=1,
-    PAPER=2,
-    SCISSORS=3
+#[derive(PartialEq)]
+pub enum Choice {
+    ROCK,
+    PAPER,
+    SCISSORS
 }
 
 pub fn round_score(opponent_choice: Choice, my_choice: Choice) -> u8 {
@@ -17,25 +18,50 @@ pub fn round_score(opponent_choice: Choice, my_choice: Choice) -> u8 {
             Choice::SCISSORS => if opponent_choice == Choice::PAPER { MY_WIN } else { OPPONENT_WIN }
         }
     };
-    return game_score + my_choice
+    let choice_score = match my_choice {
+        Choice::ROCK => 1,
+        Choice::PAPER => 2,
+        Choice::SCISSORS => 3
+    };
+    return game_score + choice_score;
 }
 
 #[cfg(test)]
-mod tests {
+mod day2_tests {
     use super::*;
 
     #[test]
-    fn test_first_round() {
+    fn test_rock_paper() {
         assert_eq!(round_score(Choice::ROCK, Choice::PAPER), 8);
     }
 
     #[test]
-    fn test_second_round() {
+    fn test_paper_rock() {
         assert_eq!(round_score(Choice::PAPER, Choice::ROCK), 1);
     }
 
     #[test]
-    fn test_third_round() {
-        assert_eq!(round_score(Choice::SCISSORS, Choice::SCISSORS), 3);
+    fn test_both_scissors() {
+        assert_eq!(round_score(Choice::SCISSORS, Choice::SCISSORS), 6);
+    }
+
+    #[test]
+    fn test_both_rock() {
+        assert_eq!(round_score(Choice::ROCK, Choice::ROCK), 4);
+    }
+
+    #[test]
+    fn test_both_paper() {
+        assert_eq!(round_score(Choice::PAPER, Choice::PAPER), 5);
+    }
+
+    #[test]
+    fn test_scissors_rock() {
+        assert_eq!(round_score(Choice::SCISSORS, Choice::ROCK), 7);
+    }
+
+    #[test]
+    fn test_scissors_paper() {
+        assert_eq!(round_score(Choice::SCISSORS, Choice::PAPER), 2);
     }
 }
