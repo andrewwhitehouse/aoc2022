@@ -1,4 +1,4 @@
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub enum Choice {
     ROCK,
     PAPER,
@@ -117,6 +117,16 @@ pub fn required_choice(opponent_choice: Choice, desired_outcome: Outcome) -> Cho
     }
 }
 
+pub fn game_score_part2(strategies: Vec<StrategyPart2>) -> u32 {
+    let mut game_score = 0u32;
+    for strategy in strategies {
+        let my_choice = required_choice(strategy.opponent_choice, strategy.desired_outcome);
+        let score = round_score(&PlayerChoice{opponent_choice: strategy.opponent_choice, my_choice});
+        game_score += score as u32;
+    }
+    game_score
+}
+
 #[cfg(test)]
 mod day2_tests {
     use super::*;
@@ -201,5 +211,13 @@ mod day2_tests {
         assert_eq!(required_choice(Choice::SCISSORS, Outcome::WIN), Choice::ROCK);
         assert_eq!(required_choice(Choice::SCISSORS, Outcome::DRAW), Choice::SCISSORS);
         assert_eq!(required_choice(Choice::SCISSORS, Outcome::LOSE), Choice::PAPER);
+    }
+
+    #[test]
+    fn test_game_score_part2() {
+        let strategies = vec!(StrategyPart2{opponent_choice: Choice::ROCK, desired_outcome: Outcome::DRAW},
+                            StrategyPart2{opponent_choice: Choice::PAPER, desired_outcome: Outcome::LOSE},
+                            StrategyPart2{opponent_choice: Choice::SCISSORS, desired_outcome: Outcome::WIN});
+        assert_eq!(game_score_part2(strategies), 12);
     }
 }
