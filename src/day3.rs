@@ -4,11 +4,20 @@ pub fn common_item(contents: String) -> Option<char> {
     let (left, right) = contents.split_at(contents.len() / 2);
     let mut s1 = HashSet::<char>::new();
     s1.extend(left.chars());
-    let common_chars = right.chars().filter(|ch| s1.contains(ch)).collect::<HashSet<_>>().into_iter().collect::<Vec<char>>();
+    let common_chars = right
+        .chars()
+        .filter(|ch| s1.contains(ch))
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<char>>();
     if common_chars.len() > 1 {
         panic!("Expected one common char, found {}", common_chars.len());
     }
-    if common_chars.len() == 1 { Some(common_chars[0]) } else { None }
+    if common_chars.len() == 1 {
+        Some(common_chars[0])
+    } else {
+        None
+    }
 }
 
 pub fn priority(item: char) -> u32 {
@@ -22,7 +31,11 @@ pub fn priority(item: char) -> u32 {
 }
 
 pub fn parse(input: String) -> Vec<String> {
-    input.trim_end().split("\n").map(|s| String::from(s)).collect()
+    input
+        .trim_end()
+        .split("\n")
+        .map(|s| String::from(s))
+        .collect()
 }
 
 pub fn solve_part1(input: String) -> u32 {
@@ -31,13 +44,12 @@ pub fn solve_part1(input: String) -> u32 {
     for items in items_by_rucksack {
         let priority_increase = match common_item(items) {
             Some(c) => priority(c),
-            None => 0
+            None => 0,
         };
         priority_sum += priority_increase;
     }
     priority_sum
 }
-
 
 #[cfg(test)]
 mod day3_tests {
@@ -86,19 +98,25 @@ mod day3_tests {
     #[test]
     fn test_parsing() {
         let input = String::from("abc\njkl\nxyz\n");
-        let expected = vec!(String::from("abc"), String::from("jkl"), String::from("xyz"));
+        let expected = vec![
+            String::from("abc"),
+            String::from("jkl"),
+            String::from("xyz"),
+        ];
         assert_eq!(parse(input), expected);
     }
 
     #[test]
     fn test_example() {
-        let input = format!("{}\n{}\n{}\n{}\n{}\n{}\n",
+        let input = format!(
+            "{}\n{}\n{}\n{}\n{}\n{}\n",
             "vJrwpWtwJgWrhcsFMMfFFhFp",
             "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
             "PmmdzqPrVvPwwTWBwg",
             "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
             "ttgJtRGJQctTZtZT",
-            "CrZsJsPPZsGzwwsLwLmpwMDw");
+            "CrZsJsPPZsGzwwsLwLmpwMDw"
+        );
         let result = solve_part1(input);
         assert_eq!(result, 157);
     }
