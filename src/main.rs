@@ -24,7 +24,8 @@ fn read_file(path: &str) -> String {
 
 fn solve_day3() {
     let input = read_file("input/day3.txt");
-    println!("Day 3 Part 1 {}", day3::solve_part1(input));
+    println!("Day 3 Part 1 {}", day3::solve_part1(input.clone()));
+    println!("Day 3 Part 2 {}", day3::solve_part2(input));
 }
 
 pub fn main() {

@@ -72,6 +72,29 @@ pub fn solve_part1(input: String) -> u32 {
     priority_sum
 }
 
+pub fn solve_part2(input: String) -> u32 {
+    let items_by_rucksack = parse(input);
+    let mut common_items: Vec<Option<char>> = Vec::new();
+    for i in (0..items_by_rucksack.len()).step_by(3) {
+        let mut team_contents: Vec<String> = Vec::new();
+        team_contents.push(items_by_rucksack[i].clone());
+        team_contents.push(items_by_rucksack[i+1].clone());
+        team_contents.push(items_by_rucksack[i+2].clone());
+
+        common_items.push(common_item_part2(team_contents));
+    }
+
+    let mut priority_sum = 0u32;
+    for common_item in common_items {
+        let priority_increase = match common_item {
+            Some(c) => priority(c),
+            None => 0,
+        };
+        priority_sum += priority_increase;
+    }
+    priority_sum
+}
+
 #[cfg(test)]
 mod day3_tests {
     use super::*;
@@ -128,7 +151,7 @@ mod day3_tests {
     }
 
     #[test]
-    fn test_example() {
+    fn test_example_part1() {
         let input = format!(
             "{}\n{}\n{}\n{}\n{}\n{}\n",
             "vJrwpWtwJgWrhcsFMMfFFhFp",
@@ -148,5 +171,20 @@ mod day3_tests {
                              String::from("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"),
                              String::from("PmmdzqPrVvPwwTWBwg"));
         assert_eq!(common_item_part2(rucksacks), Some('r'));
+    }
+
+    #[test]
+    fn test_example_part2() {
+        let input = format!(
+            "{}\n{}\n{}\n{}\n{}\n{}\n",
+            "vJrwpWtwJgWrhcsFMMfFFhFp",
+            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+            "PmmdzqPrVvPwwTWBwg",
+            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+            "ttgJtRGJQctTZtZT",
+            "CrZsJsPPZsGzwwsLwLmpwMDw"
+        );
+        let result = solve_part2(input);
+        assert_eq!(result, 70);
     }
 }
