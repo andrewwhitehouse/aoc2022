@@ -22,8 +22,13 @@ fn read_file(path: &str) -> String {
     fs::read_to_string(path).expect("failed to read input file")
 }
 
+fn solve_day3() {
+    let input = read_file("input/day3.txt");
+    println!("Day 3 Part 1 {}", day3::solve_part1(input));
+}
+
 pub fn main() {
     solve_day1();
     solve_day2();
-    day3::solve_part1(read_file("input/day2.txt"));
+    solve_day3();
 }

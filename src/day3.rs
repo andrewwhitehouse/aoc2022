@@ -1,14 +1,14 @@
 use std::collections::HashSet;
 
-pub fn common_item(contents: String) -> char {
+pub fn common_item(contents: String) -> Option<char> {
     let (left, right) = contents.split_at(contents.len() / 2);
     let mut s1 = HashSet::<char>::new();
     s1.extend(left.chars());
     let common_chars = right.chars().filter(|ch| s1.contains(ch)).collect::<HashSet<_>>().into_iter().collect::<Vec<char>>();
-    if common_chars.len() != 1 {
+    if common_chars.len() > 1 {
         panic!("Expected one common char, found {}", common_chars.len());
     }
-    common_chars[0]
+    if common_chars.len() == 1 { Some(common_chars[0]) } else { None }
 }
 
 pub fn priority(item: char) -> u32 {
@@ -29,7 +29,11 @@ pub fn solve_part1(input: String) -> u32 {
     let items_by_rucksack = parse(input);
     let mut priority_sum = 0u32;
     for items in items_by_rucksack {
-        priority_sum += priority(common_item(items));
+        let priority_increase = match common_item(items) {
+            Some(c) => priority(c),
+            None => 0
+        };
+        priority_sum += priority_increase;
     }
     priority_sum
 }
@@ -42,19 +46,25 @@ mod day3_tests {
     #[test]
     fn test_finds_common_item1() {
         let contents = String::from("vJrwpWtwJgWrhcsFMMfFFhFp");
-        assert_eq!(common_item(contents), 'p');
+        assert_eq!(common_item(contents), Some('p'));
     }
 
     #[test]
     fn test_finds_common_item2() {
         let contents = String::from("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"); // actually appears twice in both sides
-        assert_eq!(common_item(contents), 'L');
+        assert_eq!(common_item(contents), Some('L'));
     }
 
     #[test]
     fn test_finds_common_item3() {
         let contents = String::from("PmmdzqPrVvPwwTWBwg");
-        assert_eq!(common_item(contents), 'P');
+        assert_eq!(common_item(contents), Some('P'));
+    }
+
+    #[test]
+    fn test_finds_no_common_item() {
+        let contents = String::from("abcdef");
+        assert_eq!(common_item(contents), None);
     }
 
     #[test]
