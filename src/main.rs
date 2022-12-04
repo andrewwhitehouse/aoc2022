@@ -3,6 +3,7 @@ use std::fs;
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 fn solve_day1() {
     let input = fs::read_to_string("input/day1.txt").expect("failed to read day1 input");
