@@ -20,6 +20,27 @@ pub fn common_item(contents: String) -> Option<char> {
     }
 }
 
+pub fn common_item_part2(team_contents: Vec<String>) -> Option<char> {
+    assert!(team_contents.len() == 3);
+
+    let mut common =  HashSet::<char>::new();
+    common.extend(team_contents[0].chars());
+
+    for other in &team_contents[1..] {
+        common.retain(|&ch| other.contains(ch));
+    }
+
+    let result = common.into_iter().collect::<Vec<char>>();
+    if result.len() > 1 {
+        panic!("Expected one common char, found {}", result.len());
+    }
+    if result.len() == 1 {
+        Some(result[0])
+    } else {
+        None
+    }
+}
+
 pub fn priority(item: char) -> u32 {
     if item >= 'a' && item <= 'z' {
         (item as u32) - 97 + 1
@@ -119,5 +140,13 @@ mod day3_tests {
         );
         let result = solve_part1(input);
         assert_eq!(result, 157);
+    }
+
+    #[test]
+    fn test_common_item_part2() {
+        let rucksacks = vec!(String::from("vJrwpWtwJgWrhcsFMMfFFhFp"),
+                             String::from("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"),
+                             String::from("PmmdzqPrVvPwwTWBwg"));
+        assert_eq!(common_item_part2(rucksacks), Some('r'));
     }
 }
