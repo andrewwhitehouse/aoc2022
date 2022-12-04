@@ -21,6 +21,19 @@ pub fn priority(item: char) -> u32 {
     }
 }
 
+pub fn parse(input: String) -> Vec<String> {
+    input.trim_end().split("\n").map(|s| String::from(s)).collect()
+}
+
+pub fn solve_part1(input: String) -> u32 {
+    let items_by_rucksack = parse(input);
+    let mut priority_sum = 0u32;
+    for items in items_by_rucksack {
+        priority_sum += priority(common_item(items));
+    }
+    priority_sum
+}
+
 
 #[cfg(test)]
 mod day3_tests {
@@ -58,5 +71,25 @@ mod day3_tests {
     #[should_panic]
     fn test_invalid_item() {
         priority('&');
+    }
+
+    #[test]
+    fn test_parsing() {
+        let input = String::from("abc\njkl\nxyz\n");
+        let expected = vec!(String::from("abc"), String::from("jkl"), String::from("xyz"));
+        assert_eq!(parse(input), expected);
+    }
+
+    #[test]
+    fn test_example() {
+        let input = format!("{}\n{}\n{}\n{}\n{}\n{}\n",
+            "vJrwpWtwJgWrhcsFMMfFFhFp",
+            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+            "PmmdzqPrVvPwwTWBwg",
+            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+            "ttgJtRGJQctTZtZT",
+            "CrZsJsPPZsGzwwsLwLmpwMDw");
+        let result = solve_part1(input);
+        assert_eq!(result, 157);
     }
 }

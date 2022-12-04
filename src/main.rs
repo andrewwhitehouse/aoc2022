@@ -18,7 +18,12 @@ fn solve_day2() {
     println!("Day 2 Part 2 {}", day2::game_score_part2(day2::parse_part2(input)));
 }
 
+fn read_file(path: &str) -> String {
+    fs::read_to_string(path).expect("failed to read input file")
+}
+
 pub fn main() {
     solve_day1();
     solve_day2();
+    day3::solve_part1(read_file("input/day2.txt"));
 }
