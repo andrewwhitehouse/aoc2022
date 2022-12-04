@@ -33,9 +33,29 @@ pub fn fully_contained(ranges: Vec<Range>) -> u32 {
     count
 }
 
+pub fn overlapping(ranges: Vec<Range>) -> u32 {
+    let mut count = 0u32;
+    for i in (0..ranges.len()).step_by(2) {
+        let left = &ranges[i];
+        let right = &ranges[i + 1];
+        let lower = if left.from <= right.from { left } else { right };
+        let upper = if left.from > right.from { left } else { right };
+        if lower.to >= upper.from {
+            // left fully contains right
+            count = count + 1;
+        }
+    }
+    count
+}
+
 pub fn solve_part1(input: String) -> u32 {
     let ranges = parse(input);
     fully_contained(ranges)
+}
+
+pub fn solve_part2(input: String) -> u32 {
+    let ranges = parse(input);
+    overlapping(ranges)
 }
 
 #[cfg(test)]
@@ -71,5 +91,24 @@ mod day4_tests {
             Range { from: 4, to: 8 },
         ];
         assert_eq!(fully_contained(ranges), 2);
+    }
+
+    #[test]
+    fn test_overlapping() {
+        let ranges = vec![
+            Range { from: 2, to: 4 },
+            Range { from: 6, to: 8 },
+            Range { from: 2, to: 3 },
+            Range { from: 4, to: 5 },
+            Range { from: 5, to: 7 },
+            Range { from: 7, to: 9 },
+            Range { from: 2, to: 8 },
+            Range { from: 3, to: 7 },
+            Range { from: 6, to: 6 },
+            Range { from: 4, to: 6 },
+            Range { from: 2, to: 6 },
+            Range { from: 4, to: 8 },
+        ];
+        assert_eq!(overlapping(ranges), 4);
     }
 }
