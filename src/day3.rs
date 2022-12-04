@@ -11,6 +11,16 @@ pub fn common_item(contents: String) -> char {
     common_chars[0]
 }
 
+pub fn priority(item: char) -> u32 {
+    if item >= 'a' && item <= 'z' {
+        (item as u32) - 97 + 1
+    } else if item >= 'A' && item <= 'Z' {
+        (item as u32) - 65 + 27
+    } else {
+        panic!("Not a valid item character {}", item);
+    }
+}
+
 
 #[cfg(test)]
 mod day3_tests {
@@ -32,5 +42,21 @@ mod day3_tests {
     fn test_finds_common_item3() {
         let contents = String::from("PmmdzqPrVvPwwTWBwg");
         assert_eq!(common_item(contents), 'P');
+    }
+
+    #[test]
+    fn test_priority_lower_case() {
+        assert_eq!(priority('c'), 3);
+    }
+
+    #[test]
+    fn test_priority_upper_case() {
+        assert_eq!(priority('L'), 38);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_item() {
+        priority('&');
     }
 }
