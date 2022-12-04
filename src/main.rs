@@ -16,7 +16,10 @@ fn solve_day2() {
     let input = fs::read_to_string("input/day2.txt").expect("failed to read day1 input");
     let choices = day2::parse(input.clone());
     println!("Day 2 Part 1 {}", day2::game_score(choices));
-    println!("Day 2 Part 2 {}", day2::game_score_part2(day2::parse_part2(input)));
+    println!(
+        "Day 2 Part 2 {}",
+        day2::game_score_part2(day2::parse_part2(input))
+    );
 }
 
 fn read_file(path: &str) -> String {

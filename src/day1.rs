@@ -56,23 +56,25 @@ mod day1_tests {
 
     #[test]
     fn find_max_sum() {
-        let batches = vec!(
-            vec!(1000, 2000, 3000),
-            vec!(4000),
-            vec!(5000, 6000),
-            vec!(7000, 8000, 9000),
-            vec!(10000));
+        let batches = vec![
+            vec![1000, 2000, 3000],
+            vec![4000],
+            vec![5000, 6000],
+            vec![7000, 8000, 9000],
+            vec![10000],
+        ];
         assert_eq!(max_sum(batches), 24_000);
     }
 
     #[test]
     fn find_sum_of_top_three() {
-        let batches = vec!(
-            vec!(1000, 2000, 3000),
-            vec!(4000),
-            vec!(5000, 6000),
-            vec!(7000, 8000, 9000),
-            vec!(10000));
+        let batches = vec![
+            vec![1000, 2000, 3000],
+            vec![4000],
+            vec![5000, 6000],
+            vec![7000, 8000, 9000],
+            vec![10000],
+        ];
         assert_eq!(sum_of_top_three(batches), 45_000);
     }
 }

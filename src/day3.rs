@@ -23,7 +23,7 @@ pub fn common_item(contents: String) -> Option<char> {
 pub fn common_item_part2(team_contents: Vec<String>) -> Option<char> {
     assert!(team_contents.len() == 3);
 
-    let mut common =  HashSet::<char>::new();
+    let mut common = HashSet::<char>::new();
     common.extend(team_contents[0].chars());
 
     for other in &team_contents[1..] {
@@ -78,8 +78,8 @@ pub fn solve_part2(input: String) -> u32 {
     for i in (0..items_by_rucksack.len()).step_by(3) {
         let mut team_contents: Vec<String> = Vec::new();
         team_contents.push(items_by_rucksack[i].clone());
-        team_contents.push(items_by_rucksack[i+1].clone());
-        team_contents.push(items_by_rucksack[i+2].clone());
+        team_contents.push(items_by_rucksack[i + 1].clone());
+        team_contents.push(items_by_rucksack[i + 2].clone());
 
         common_items.push(common_item_part2(team_contents));
     }
@@ -167,9 +167,11 @@ mod day3_tests {
 
     #[test]
     fn test_common_item_part2() {
-        let rucksacks = vec!(String::from("vJrwpWtwJgWrhcsFMMfFFhFp"),
-                             String::from("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"),
-                             String::from("PmmdzqPrVvPwwTWBwg"));
+        let rucksacks = vec![
+            String::from("vJrwpWtwJgWrhcsFMMfFFhFp"),
+            String::from("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"),
+            String::from("PmmdzqPrVvPwwTWBwg"),
+        ];
         assert_eq!(common_item_part2(rucksacks), Some('r'));
     }
 
