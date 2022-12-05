@@ -36,8 +36,9 @@ fn parse_stacks(lines: Vec<&str>) -> Vec<Vec<char>> {
     for line_index in 1..lines.len() {
         for column_index in 1..populated_column_indexes.len() {
             let layer = string_chars(lines[line_index]);
+            //println!("Layer {:?} column_index {} populated_column_index {}", layer, column_index, populated_column_indexes[column_index]);
             let populated_column_index = populated_column_indexes[column_index];
-            if layer[populated_column_index] != ' ' {
+            if populated_column_index < layer.len() && layer[populated_column_index] != ' ' {
                 //println!("column_index {} layer {}", column_index, layer[populated_column_index]);
                 let stack_identifier = layer[populated_column_index];
                 stacks[column_index].push(stack_identifier);
@@ -79,7 +80,7 @@ fn parse_movements(lines: Vec<&str>) -> Vec<Movement> {
 
 pub fn parse(input: String) -> Parameters {
     let sections: Vec<&str> = input.split("\n\n").collect();
-    let stacks = parse_stacks(sections[0].lines().rev().collect());
+    let stacks = parse_stacks(sections[0].trim_end().lines().rev().collect());
     let movements = parse_movements(sections[1].lines().collect());
     Parameters {
         stacks: stacks,
@@ -99,6 +100,16 @@ pub fn process_part1(parameters: Parameters) -> Vec<Vec<char>> {
         }
     }
     stacks
+}
+
+pub fn solve_part1(input: String) -> String {
+    let parameters = parse(input);
+    let rearranged = process_part1(parameters);
+    let mut result = String::new();
+    for stack in rearranged[1..].iter() {
+        result.push(if stack.len() > 0 { stack[stack.len()-1] } else { ' ' });
+    }
+    result
 }
 
 #[cfg(test)]
@@ -192,5 +203,19 @@ mod day5_tests {
             string_chars("helloworld"),
             vec!['h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd']
         );
+    }
+
+    #[test]
+    fn test_example() {
+        let input = format!(
+            "{}\n{}\n{}\n{}\n\n{}",
+            "    [D]    ",
+            "[N] [C]    ",
+            "[Z] [M] [P]",
+            " 1   2   3 ",
+            "move 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2\n"
+        );
+        let result = solve_part1(input);
+        assert_eq!(result, "CMZ");
     }
 }
