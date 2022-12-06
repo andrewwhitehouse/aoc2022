@@ -46,10 +46,15 @@ fn solve_day5() {
     println!("Day 5 Part 2 {}", day5::solve_part2(input));
 }
 
+fn solve_day6() {
+    let input = read_file("input/day6.txt");
+    println!("Day 6 Part 1 {}", day6::solve_part1(input));
+}
 pub fn main() {
     solve_day1();
     solve_day2();
     solve_day3();
     solve_day4();
     solve_day5();
+    solve_day6();
 }
