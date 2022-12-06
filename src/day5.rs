@@ -102,6 +102,23 @@ pub fn process_part1(parameters: Parameters) -> Vec<Vec<char>> {
     stacks
 }
 
+pub fn process_part2(parameters: Parameters) -> Vec<Vec<char>> {
+    let mut stacks = Vec::new();
+    for stack in parameters.stacks {
+        stacks.push(stack.clone());
+    }
+    for movement in parameters.movements {
+        let mut moved = Vec::new();
+        for _ in 0..movement.quantity {
+            moved.push(stacks[movement.from_stack].pop());
+        }
+        for item in moved.iter().rev() {
+            stacks[movement.to_stack].push(item.unwrap());
+        }
+    }
+    stacks
+}
+
 pub fn solve_part1(input: String) -> String {
     let parameters = parse(input);
     let rearranged = process_part1(parameters);
@@ -164,9 +181,8 @@ mod day5_tests {
         );
     }
 
-    #[test]
-    fn test_movement() {
-        let initial = Parameters {
+    fn example_parameters() -> Parameters {
+        Parameters {
             stacks: vec![vec![], vec!['Z', 'N'], vec!['M', 'C', 'D'], vec!['P']],
             movements: vec![
                 Movement {
@@ -190,8 +206,12 @@ mod day5_tests {
                     to_stack: 2,
                 },
             ],
-        };
-        let after = process_part1(initial);
+        }
+    }
+
+    #[test]
+    fn test_movement_part1() {
+        let after = process_part1(example_parameters());
         assert_eq!(after[1], vec!['C']);
         assert_eq!(after[2], vec!['M']);
         assert_eq!(after[3], vec!['P', 'D', 'N', 'Z']);
@@ -217,5 +237,13 @@ mod day5_tests {
         );
         let result = solve_part1(input);
         assert_eq!(result, "CMZ");
+    }
+
+    #[test]
+    fn test_movement_part2() {
+        let after = process_part2(example_parameters());
+        assert_eq!(after[1], vec!['M']);
+        assert_eq!(after[2], vec!['C']);
+        assert_eq!(after[3], vec!['P', 'Z', 'N', 'D']);
     }
 }
