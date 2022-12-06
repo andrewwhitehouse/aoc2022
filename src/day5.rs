@@ -129,6 +129,16 @@ pub fn solve_part1(input: String) -> String {
     result
 }
 
+pub fn solve_part2(input: String) -> String {
+    let parameters = parse(input);
+    let rearranged = process_part2(parameters);
+    let mut result = String::new();
+    for stack in rearranged[1..].iter() {
+        result.push(if stack.len() > 0 { stack[stack.len()-1] } else { ' ' });
+    }
+    result
+}
+
 #[cfg(test)]
 mod day5_tests {
     use super::*;
