@@ -1,5 +1,44 @@
-pub fn visible(heights: Vec<Vec<char>>) -> usize {
-    0
+pub fn visible(heights: Vec<Vec<char>>) -> u32 {
+    let edge_count = heights[0].len()*2 + 2*(heights.len()-2);
+    let mut row_visible = 0u32;
+    for row_index in 1..(heights.len()-1) {
+        for column_index in 1..heights[row_index].len() {
+            if heights[row_index][column_index] > heights[row_index][column_index-1] {
+                row_visible += 1;
+            } else {
+                break;
+            }
+        }
+    }
+    for row_index in 1..(heights.len()-1) {
+        for column_index in (1..heights[row_index].len()).rev() {
+            if heights[row_index][column_index-1] > heights[row_index][column_index] {
+                row_visible += 1;
+            } else {
+                break;
+            }
+        }
+    }
+    let mut columns_visible = 0u32;
+    for column_index in 1..(heights.len()-1) {
+        for row_index in 1..heights[column_index].len() {
+            if heights[row_index][column_index] > heights[row_index-1][column_index] {
+                columns_visible += 1;
+            } else {
+                break;
+            }
+        }
+    }
+    for column_index in 1..(heights.len()-1) {
+        for row_index in (1..heights[column_index].len()).rev() {
+            if heights[row_index-1][column_index] > heights[row_index][column_index] {
+                columns_visible += 1;
+            } else {
+                break;
+            }
+        }
+    }
+    edge_count as u32 + row_visible + columns_visible
 }
 
 #[cfg(test)]
@@ -14,7 +53,7 @@ mod day8_tests {
             vec!('6', '5', '3', '3', '2'),
             vec!('3', '3', '5', '4', '9'),
             vec!('3', '5', '3', '9', '0'));
-        assert_eq!(visible(heights), 16);
+        assert_eq!(visible(heights), 21);
     }
 }
 
