@@ -1,3 +1,15 @@
+fn string_chars(s: &str) -> Vec<char> {
+    s.as_bytes().iter().map(|b| *b as char).collect()
+}
+
+pub fn parse(input: String) -> Vec<Vec<char>> {
+    let mut result = Vec::new();
+    for line in input.trim_end().split("\n") {
+        result.push(string_chars(line))
+    }
+    result
+}
+
 pub fn visible(heights: Vec<Vec<char>>) -> u32 {
     let edge_count = heights[0].len()*2 + 2*(heights.len()-2);
     let mut row_visible = 0u32;
@@ -54,6 +66,14 @@ mod day8_tests {
             vec!('3', '3', '5', '4', '9'),
             vec!('3', '5', '3', '9', '0'));
         assert_eq!(visible(heights), 21);
+    }
+
+    #[test]
+    fn test_parse() {
+        let expected = vec!(
+            vec!('3', '0', '3'),
+            vec!('2', '5', '5'));
+        assert_eq!(parse(String::from("303\n255\n")), expected);
     }
 }
 
