@@ -62,6 +62,62 @@ pub fn is_visible_from_edge(heights: &Vec<Vec<char>>, row_index: usize, col_inde
     return visible_from_bottom
 }
 
+pub fn scenic_score(heights: &Vec<Vec<char>>, row_index: usize, col_index: usize) -> u32 {
+    let height = heights[row_index][col_index];
+
+    //println!("Index {},{} Height {}", row_index, col_index, height);
+
+    let mut left_distance = 0u32;
+    for left_index in (0..col_index).rev() {
+        left_distance += 1;
+        //println!("left row {} column {}", row_index, col_index);
+        if heights[row_index][left_index] >= height {
+            break;
+        }
+    }
+
+    let mut right_distance = 0u32;
+    for right_index in (col_index+1)..heights[row_index].len() {
+        right_distance += 1;
+        if heights[row_index][right_index] >= height {
+            break;
+        }
+    }
+
+    let mut up_distance = 0u32;
+    for up_index in (0..row_index).rev() {
+        up_distance += 1;
+        if heights[up_index][col_index] >= height {
+            break;
+        }
+    }
+
+    let mut down_distance = 0u32;
+    for down_index in (row_index+1)..heights.len() {
+        down_distance += 1;
+        if heights[down_index][col_index] >= height {
+            break;
+        }
+    }
+
+    //println!("up {} down {} left {} right {}", up_distance, down_distance, left_distance, right_distance);
+    return left_distance * right_distance * up_distance * down_distance;
+}
+
+pub fn highest_scenic_score(heights: &Vec<Vec<char>>) -> u32 {
+    let mut highest_score = 0u32;
+    for row_index in 0..heights.len() {
+        for col_index in 0..heights[row_index].len() {
+            let score = scenic_score(heights, row_index, col_index);
+            //println!("Score {}", score);
+            if score > highest_score {
+                highest_score = score;
+            }
+        }
+    }
+    highest_score
+}
+
 pub fn count_visible(heights: Vec<Vec<char>>) -> u32 {
     let mut visible = 0u32;
     for row_index in 0..heights.len() {
@@ -81,19 +137,42 @@ pub fn solve_part1(input: String) -> u32 {
     count_visible(heights)
 }
 
+pub fn solve_part2(input: String) -> u32 {
+    let heights = parse(input);
+    highest_scenic_score(&heights)
+}
+
 #[cfg(test)]
 mod day8_tests {
     use super::*;
 
-    #[test]
-    fn test_find_visible() {
-        let heights = vec!(
+    fn example_heights() -> Vec<Vec<char>> {
+        vec!(
             vec!('3', '0', '3', '7', '3'),
             vec!('2', '5', '5', '1', '2'),
             vec!('6', '5', '3', '3', '2'),
             vec!('3', '3', '5', '4', '9'),
-            vec!('3', '5', '3', '9', '0'));
-        assert_eq!(count_visible(heights), 21);
+            vec!('3', '5', '3', '9', '0'))
+    }
+
+    #[test]
+    fn test_find_visible() {
+        assert_eq!(count_visible(example_heights()), 21);
+    }
+
+    #[test]
+    fn test_scenic_score() {
+        assert_eq!(scenic_score(&example_heights(), 1, 2), 4);
+    }
+
+    #[test]
+    fn test_scenic_score2() {
+        assert_eq!(scenic_score(&example_heights(), 3, 2), 8);
+    }
+
+    #[test]
+    fn test_highest_score() {
+        assert_eq!(highest_scenic_score(&example_heights()), 8);
     }
 
     #[test]
