@@ -53,6 +53,11 @@ fn solve_day6() {
     println!("Day 6 Part 2 {}", day6::solve_part2(input));
 }
 
+fn solve_day8() {
+    let input = read_file("input/day8.txt");
+    println!("Day 8 Part 1 {}", day8::solve_part1(input.clone()));
+}
+
 pub fn main() {
     solve_day1();
     solve_day2();
@@ -60,4 +65,5 @@ pub fn main() {
     solve_day4();
     solve_day5();
     solve_day6();
+    solve_day8();
 }
