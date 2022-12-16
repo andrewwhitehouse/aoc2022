@@ -12,18 +12,37 @@ pub struct Movement {
     distance: u32
 }
 
+#[derive(PartialEq, Debug)]
 pub struct Position {
     x: u32,
     y: u32
 }
 
+#[derive(PartialEq, Debug)]
 pub struct Positions {
     head: Position,
     tail: Position
 }
 
 pub fn parse(input: String) -> Vec<Movement> {
-    Vec::new()
+    let mut result = Vec::new();
+    for line in input.trim_end().split("\n") {
+        let movement: Vec<&str> = line.trim().split(" ").collect();
+        println!("{:?}", movement);
+        let direction = match movement[0] {
+            "R" => Direction::RIGHT,
+            "L" => Direction::LEFT,
+            "U" => Direction::UP,
+            "D" => Direction::DOWN,
+            &_ => todo!()
+        };
+        result.push(Movement{direction: direction, distance: movement[1].parse::<u32>().unwrap()});
+    }
+    result
+}
+
+pub fn navigate(start: Positions, movements: Vec<Movement>) -> Positions {
+    Positions{head: Position{x: 0, y: 0}, tail: Position{x: 0, y: 0}}
 }
 
 #[cfg(test)]
@@ -40,6 +59,16 @@ mod day9_tests {
             Movement{distance: 8, direction: Direction::DOWN},
             Movement{distance: 4, direction: Direction::UP});
         assert_eq!(parse(input), expected);
+    }
+
+    fn starting_positions() -> Positions {
+        Positions{head: Position{x: 0, y: 0}, tail: Position{x: 0, y: 0}}
+    }
+
+    #[test]
+    fn test_navigate_right() {
+        let expected = Positions{head: Position{x: 4, y: 0}, tail: Position{x: 3, y: 0}};
+        assert_eq!(navigate(starting_positions(), vec!(Movement{direction: Direction::RIGHT, distance: 4})), expected);
     }
 }
 
