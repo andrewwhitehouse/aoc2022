@@ -54,6 +54,10 @@ fn move_head(start: Positions, direction: Direction) -> Positions {
     if head_position.y == tail_position.y && head_position.x.abs_diff(tail_position.x) == 2
     || head_position.x == tail_position.x && head_position.y.abs_diff(tail_position.y) == 2 {
         new_tail_position = Position{x: (head_position.x+tail_position.x)/2, y: (head_position.y+tail_position.y)/2};
+    } else {
+        let x_change = if head_position.x > tail_position.x { 1 } else { -1 };
+        let y_change = if head_position.y > tail_position.y { 1 } else { -1 };
+        new_tail_position = Position{x: tail_position.x+x_change, y: tail_position.y+y_change};
     }
 
     Positions{head: head_position, tail: new_tail_position}
@@ -111,6 +115,13 @@ mod day9_tests {
     fn test_first_move_up() {
         let starting_positions = Positions{head: Position{x: 4, y: 0}, tail: Position{x: 3, y: 0}};
         let expected = Positions{head: Position{x: 4, y: -1}, tail: Position{x: 3, y: 0}};
+        assert_eq!(navigate(starting_positions, vec!(Movement{direction: Direction::UP, distance: 1})), expected);
+    }
+
+    #[test]
+    fn test_second_move_up() {
+        let starting_positions = Positions{head: Position{x: 4, y: -1}, tail: Position{x: 3, y: 0}};
+        let expected = Positions{head: Position{x: 4, y: -2}, tail: Position{x: 4, y: -1}};
         assert_eq!(navigate(starting_positions, vec!(Movement{direction: Direction::UP, distance: 1})), expected);
     }
 }
