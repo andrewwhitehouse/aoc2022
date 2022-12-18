@@ -60,6 +60,11 @@ fn solve_day8() {
     println!("Day 8 Part 2 {}", day8::solve_part2(input));
 }
 
+fn solve_day9() {
+    let input = read_file("input/day9.txt");
+    println!("Day 9 Part 1 {}", day9::count_visited(input));
+}
+
 pub fn main() {
     solve_day1();
     solve_day2();
@@ -68,4 +73,5 @@ pub fn main() {
     solve_day5();
     solve_day6();
     solve_day8();
+    solve_day9();
 }

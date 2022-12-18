@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub enum Direction {
     UP,
@@ -12,13 +14,13 @@ pub struct Movement {
     distance: u32,
 }
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy, Hash, Eq)]
 pub struct Position {
     x: i32,
     y: i32,
 }
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy, Hash, Eq)]
 pub struct Positions {
     head: Position,
     tail: Position,
@@ -35,7 +37,6 @@ pub fn parse(input: String) -> Vec<Movement> {
     let mut result = Vec::new();
     for line in input.trim_end().split("\n") {
         let movement: Vec<&str> = line.trim().split(" ").collect();
-        println!("{:?}", movement);
         let direction = match movement[0] {
             "R" => Direction::RIGHT,
             "L" => Direction::LEFT,
@@ -68,8 +69,7 @@ fn move_one_step(start: Positions, direction: Direction) -> Positions {
         Direction::DOWN => Position {
             x: start.head.x,
             y: start.head.y+1,
-        },
-        _ => start.head,
+        }
     };
 
     let tail_position = &start.tail.clone();
@@ -81,7 +81,7 @@ fn move_one_step(start: Positions, direction: Direction) -> Positions {
             tail: start.tail,
         }
     } else {
-        let mut new_tail_position = start.tail;
+        let new_tail_position;
         // Check if tail is two steps away
         if head_position.y == tail_position.y && head_position.x.abs_diff(tail_position.x) == 2
             || head_position.x == tail_position.x && head_position.y.abs_diff(tail_position.y) == 2
@@ -124,6 +124,17 @@ pub fn navigate(start: Positions, movements: Vec<Movement>) -> Journey {
         }
     }
     Journey{start: start, end: positions, visited: visited}
+}
+
+pub fn count_visited(input: String) -> u32 {
+    let moves = parse(input);
+    let starting_positions = Positions{head:Position{x:0, y:0}, tail:Position{x:0, y:0}};
+    let journey = navigate(starting_positions, moves);
+    let mut tail_visited = HashSet::new();
+    for position in journey.visited {
+        tail_visited.insert(position.tail);
+    }
+    tail_visited.len() as u32
 }
 
 #[cfg(test)]
@@ -449,5 +460,12 @@ mod day9_tests {
         assert_eq!(result.start, starting_positions);
         assert_eq!(result.end, expected);
         assert_eq!(result.visited.len(), 25);
+    }
+
+    #[test]
+    fn acceptance_test() {
+        let moves = "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2";
+        let locations_visited =count_visited(moves.to_string());
+        assert_eq!(locations_visited, 13);
     }
 }
