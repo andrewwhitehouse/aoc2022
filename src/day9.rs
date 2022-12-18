@@ -117,15 +117,26 @@ pub fn navigate(start: Rope, movements: Vec<Movement>) -> Vec<Position> {
     tail_visited
 }
 
-pub fn count_visited(input: String) -> u32 {
+pub fn count_visited(input: String, knot_count: u32) -> u32 {
     let moves = parse(input);
-    let initial = Rope {knots: vec!(Position{x:0, y:0}, Position{x:0, y:0})};
-    let tail_visited = navigate(initial, moves);
+    let mut initial = Vec::new();
+    for _ in 0..knot_count {
+        initial.push(Position{x:0, y:0});
+    }
+    let tail_visited = navigate(Rope{knots: initial}, moves);
     let mut unique_visited = HashSet::new();
     for position in tail_visited {
         unique_visited.insert(position);
     }
     unique_visited.len() as u32
+}
+
+pub fn count_visited_part1(input: String) -> u32 {
+    count_visited(input, 2)
+}
+
+pub fn count_visited_part2(input: String) -> u32 {
+    count_visited(input, 10)
 }
 
 #[cfg(test)]
@@ -412,7 +423,14 @@ mod day9_tests {
     #[test]
     fn acceptance_test() {
         let moves = "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2";
-        let locations_visited =count_visited(moves.to_string());
+        let locations_visited =count_visited_part1(moves.to_string());
         assert_eq!(locations_visited, 13);
+    }
+
+    #[test]
+    fn acceptance_test_part2() {
+        let moves = "R 5\nU 8\nL 8\nD 3\nR 17\nD 10\nL 25\nU 20";
+        let locations_visited =count_visited_part2(moves.to_string());
+        assert_eq!(locations_visited, 36);
     }
 }

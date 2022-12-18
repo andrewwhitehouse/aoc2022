@@ -62,7 +62,8 @@ fn solve_day8() {
 
 fn solve_day9() {
     let input = read_file("input/day9.txt");
-    println!("Day 9 Part 1 {}", day9::count_visited(input));
+    println!("Day 9 Part 1 {}", day9::count_visited_part1(input.clone()));
+    println!("Day 9 Part 2 {}", day9::count_visited_part2(input));
 }
 
 pub fn main() {
