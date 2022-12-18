@@ -20,17 +20,16 @@ pub struct Position {
     y: i32,
 }
 
-#[derive(PartialEq, Debug, Clone, Copy, Hash, Eq)]
-pub struct Positions {
-    head: Position,
-    tail: Position,
+#[derive(PartialEq, Debug, Clone, Hash, Eq)]
+pub struct Rope {
+    knots: Vec<Position>
 }
 
 #[derive(PartialEq, Debug)]
 pub struct Journey {
-    start: Positions,
-    end: Positions,
-    visited: Vec<Positions>
+    start: Rope,
+    end: Rope,
+    visited: Vec<Rope>
 }
 
 pub fn parse(input: String) -> Vec<Movement> {
@@ -52,89 +51,81 @@ pub fn parse(input: String) -> Vec<Movement> {
     result
 }
 
-fn move_one_step(start: Positions, direction: Direction) -> Positions {
-    let head_position = match direction {
+fn move_head_one_step(rope: Rope, direction: Direction) -> Rope {
+    let mut updated = Rope{knots: Vec::new()};
+    updated.knots.push(match direction {
         Direction::RIGHT => Position {
-            x: start.head.x + 1,
-            y: start.head.y,
+            x: rope.knots[0].x + 1,
+            y: rope.knots[0].y,
         },
         Direction::UP => Position {
-            x: start.head.x,
-            y: start.head.y - 1,
+            x: rope.knots[0].x,
+            y: rope.knots[0].y - 1,
         },
         Direction::LEFT => Position {
-            x: start.head.x-1,
-            y: start.head.y,
+            x: rope.knots[0].x-1,
+            y: rope.knots[0].y,
         },
         Direction::DOWN => Position {
-            x: start.head.x,
-            y: start.head.y+1,
+            x: rope.knots[0].x,
+            y: rope.knots[0].y+1,
         }
-    };
+    });
 
-    let tail_position = &start.tail.clone();
-    if head_position.y.abs_diff(tail_position.y) <= 1
-        && head_position.x.abs_diff(tail_position.x) <= 1
-    {
-        Positions {
-            head: head_position,
-            tail: start.tail,
-        }
-    } else {
-        let new_tail_position;
-        // Check if tail is two steps away
-        if head_position.y == tail_position.y && head_position.x.abs_diff(tail_position.x) == 2
-            || head_position.x == tail_position.x && head_position.y.abs_diff(tail_position.y) == 2
-        {
-            new_tail_position = Position {
-                x: (head_position.x + tail_position.x) / 2,
-                y: (head_position.y + tail_position.y) / 2,
-            };
+    for index in 1..rope.knots.len() {
+        let current = rope.knots[index];
+        let previous = updated.knots[index - 1];
+        let knot_position = if previous.y.abs_diff(current.y) <= 1
+            && previous.x.abs_diff(current.x) <= 1 {
+            current
+        } else if previous.y == current.y && previous.x.abs_diff(current.x) == 2
+            || previous.x == current.x && previous.y.abs_diff(current.y) == 2 {
+            Position {
+                x: (previous.x + current.x) / 2,
+                y: (previous.y + current.y) / 2,
+            }
         } else {
-            let x_change = if head_position.x > tail_position.x {
+            let x_change = if previous.x > current.x {
                 1
             } else {
                 -1
             };
-            let y_change = if head_position.y > tail_position.y {
+            let y_change = if previous.y > current.y {
                 1
             } else {
                 -1
             };
-            new_tail_position = Position {
-                x: tail_position.x + x_change,
-                y: tail_position.y + y_change,
-            };
-        }
-
-        Positions {
-            head: head_position,
-            tail: new_tail_position,
-        }
+            Position {
+                x: current.x + x_change,
+                y: current.y + y_change,
+            }
+        };
+        updated.knots.push(knot_position);
     }
+    updated
 }
 
-pub fn navigate(start: Positions, movements: Vec<Movement>) -> Journey {
-    let mut positions = start.clone();
-    let mut visited = vec!(start);
+pub fn navigate(start: Rope, movements: Vec<Movement>) -> Vec<Position> {
+    let mut rope = Rope{knots:start.knots.clone()};
+    let mut tail_visited = Vec::new();
     for movement in movements {
         for _ in 0..movement.distance {
-            positions = move_one_step(positions, movement.direction);
-            visited.push(positions);
+            rope = move_head_one_step(rope, movement.direction);
+            tail_visited.push(rope.knots[rope.knots.len()-1]);
         }
     }
-    Journey{start: start, end: positions, visited: visited}
+    tail_visited
 }
 
 pub fn count_visited(input: String) -> u32 {
     let moves = parse(input);
-    let starting_positions = Positions{head:Position{x:0, y:0}, tail:Position{x:0, y:0}};
-    let journey = navigate(starting_positions, moves);
-    let mut tail_visited = HashSet::new();
-    for position in journey.visited {
-        tail_visited.insert(position.tail);
+    let initial = Rope {knots: vec!(Position{x:0, y:0}, Position{x:0, y:0})};
+    let tail_visited = navigate(initial, moves);
+    let mut unique_visited = HashSet::new();
+    for position in tail_visited {
+        unique_visited.insert(position);
     }
-    tail_visited.len() as u32
+    unique_visited.len() as u32
 }
 
 #[cfg(test)]
@@ -171,14 +162,10 @@ mod day9_tests {
 
     #[test]
     fn test_first_move_right() {
-        let starting_positions = Positions {
-            head: Position { x: 0, y: 0 },
-            tail: Position { x: 0, y: 0 },
+        let starting_positions = Rope {
+            knots: vec!(Position { x: 0, y: 0 }, Position { x: 0, y: 0 })
         };
-        let expected = Positions {
-            head: Position { x: 1, y: 0 },
-            tail: Position { x: 0, y: 0 },
-        };
+        let tail_visited = vec!(Position { x: 0, y: 0 });
         assert_eq!(
             navigate(
                 starting_positions,
@@ -186,21 +173,17 @@ mod day9_tests {
                     direction: Direction::RIGHT,
                     distance: 1
                 })
-            ).end,
-            expected
+            ),
+            tail_visited
         );
     }
 
     #[test]
     fn test_second_move_right() {
-        let starting_positions = Positions {
-            head: Position { x: 1, y: 0 },
-            tail: Position { x: 0, y: 0 },
+        let starting_positions = Rope {
+            knots: vec!(Position { x: 1, y: 0 }, Position { x: 0, y: 0 })
         };
-        let expected = Positions {
-            head: Position { x: 2, y: 0 },
-            tail: Position { x: 1, y: 0 },
-        };
+        let tail_visited = vec!(Position { x: 1, y: 0 });
         assert_eq!(
             navigate(
                 starting_positions,
@@ -208,264 +191,264 @@ mod day9_tests {
                     direction: Direction::RIGHT,
                     distance: 1
                 })
-            ).end,
-            expected
+            ),
+            tail_visited
         );
     }
-
-    #[test]
-    fn test_third_move_right() {
-        let starting_positions = Positions {
-            head: Position { x: 2, y: 0 },
-            tail: Position { x: 1, y: 0 },
-        };
-        let expected = Positions {
-            head: Position { x: 3, y: 0 },
-            tail: Position { x: 2, y: 0 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::RIGHT,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_fourth_move_right() {
-        let starting_positions = Positions {
-            head: Position { x: 3, y: 0 },
-            tail: Position { x: 2, y: 0 },
-        };
-        let expected = Positions {
-            head: Position { x: 4, y: 0 },
-            tail: Position { x: 3, y: 0 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::RIGHT,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_first_move_up() {
-        let starting_positions = Positions {
-            head: Position { x: 4, y: 0 },
-            tail: Position { x: 3, y: 0 },
-        };
-        let expected = Positions {
-            head: Position { x: 4, y: -1 },
-            tail: Position { x: 3, y: 0 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::UP,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_second_move_up() {
-        let starting_positions = Positions {
-            head: Position { x: 4, y: -1 },
-            tail: Position { x: 3, y: 0 },
-        };
-        let expected = Positions {
-            head: Position { x: 4, y: -2 },
-            tail: Position { x: 4, y: -1 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::UP,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_third_move_up() {
-        let starting_positions = Positions {
-            head: Position { x: 4, y: -2 },
-            tail: Position { x: 4, y: -1 },
-        };
-        let expected = Positions {
-            head: Position { x: 4, y: -3 },
-            tail: Position { x: 4, y: -2 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::UP,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_fourth_move_up() {
-        let starting_positions = Positions {
-            head: Position { x: 4, y: -3 },
-            tail: Position { x: 4, y: -2 },
-        };
-        let expected = Positions {
-            head: Position { x: 4, y: -4 },
-            tail: Position { x: 4, y: -3 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::UP,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_first_move_left() {
-        let starting_positions = Positions {
-            head: Position { x: 4, y: -4 },
-            tail: Position { x: 4, y: -3 },
-        };
-        let expected = Positions {
-            head: Position { x: 3, y: -4 },
-            tail: Position { x: 4, y: -3 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::LEFT,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_second_move_left() {
-        let starting_positions = Positions {
-            head: Position { x: 3, y: -4 },
-            tail: Position { x: 4, y: -3 },
-        };
-        let expected = Positions {
-            head: Position { x: 2, y: -4 },
-            tail: Position { x: 3, y: -4 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::LEFT,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_third_move_left() {
-        let starting_positions = Positions {
-            head: Position { x: 2, y: -4 },
-            tail: Position { x: 3, y: -4 },
-        };
-        let expected = Positions {
-            head: Position { x: 1, y: -4 },
-            tail: Position { x: 2, y: -4 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::LEFT,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_first_move_down() {
-        let starting_positions = Positions {
-            head: Position { x: 1, y: -4 },
-            tail: Position { x: 2, y: -4 },
-        };
-        let expected = Positions {
-            head: Position { x: 1, y: -3 },
-            tail: Position { x: 2, y: -4 },
-        };
-        assert_eq!(
-            navigate(
-                starting_positions,
-                vec!(Movement {
-                    direction: Direction::DOWN,
-                    distance: 1
-                })
-            ).end,
-            expected
-        );
-    }
-
-    #[test]
-    fn test_all_moves() {
-        let starting_positions = Positions {
-            head: Position { x: 0, y: 0 },
-            tail: Position { x: 0, y: 0 },
-        };
-        let expected = Positions {
-            head: Position { x: 2, y: -2 },
-            tail: Position { x: 1, y: -2 },
-        };
-        let moves = vec!(
-            Movement{direction: Direction::RIGHT, distance: 4},
-            Movement{direction: Direction::UP, distance: 4},
-            Movement{direction: Direction::LEFT, distance: 3},
-            Movement{direction: Direction::DOWN, distance: 1},
-            Movement{direction: Direction::RIGHT, distance: 4},
-            Movement{direction: Direction::DOWN, distance: 1},
-            Movement{direction: Direction::LEFT, distance: 5},
-            Movement{direction: Direction::RIGHT, distance: 2},
-        );
-        let result = navigate(
-            starting_positions,
-            moves
-        );
-        assert_eq!(result.start, starting_positions);
-        assert_eq!(result.end, expected);
-        assert_eq!(result.visited.len(), 25);
-    }
-
-    #[test]
-    fn acceptance_test() {
-        let moves = "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2";
-        let locations_visited =count_visited(moves.to_string());
-        assert_eq!(locations_visited, 13);
-    }
+    //
+    // #[test]
+    // fn test_third_move_right() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 2, y: 0 },
+    //         tail: Position { x: 1, y: 0 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 3, y: 0 },
+    //         tail: Position { x: 2, y: 0 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::RIGHT,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_fourth_move_right() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 3, y: 0 },
+    //         tail: Position { x: 2, y: 0 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 4, y: 0 },
+    //         tail: Position { x: 3, y: 0 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::RIGHT,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_first_move_up() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 4, y: 0 },
+    //         tail: Position { x: 3, y: 0 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 4, y: -1 },
+    //         tail: Position { x: 3, y: 0 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::UP,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_second_move_up() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 4, y: -1 },
+    //         tail: Position { x: 3, y: 0 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 4, y: -2 },
+    //         tail: Position { x: 4, y: -1 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::UP,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_third_move_up() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 4, y: -2 },
+    //         tail: Position { x: 4, y: -1 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 4, y: -3 },
+    //         tail: Position { x: 4, y: -2 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::UP,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_fourth_move_up() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 4, y: -3 },
+    //         tail: Position { x: 4, y: -2 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 4, y: -4 },
+    //         tail: Position { x: 4, y: -3 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::UP,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_first_move_left() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 4, y: -4 },
+    //         tail: Position { x: 4, y: -3 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 3, y: -4 },
+    //         tail: Position { x: 4, y: -3 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::LEFT,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_second_move_left() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 3, y: -4 },
+    //         tail: Position { x: 4, y: -3 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 2, y: -4 },
+    //         tail: Position { x: 3, y: -4 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::LEFT,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_third_move_left() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 2, y: -4 },
+    //         tail: Position { x: 3, y: -4 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 1, y: -4 },
+    //         tail: Position { x: 2, y: -4 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::LEFT,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_first_move_down() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 1, y: -4 },
+    //         tail: Position { x: 2, y: -4 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 1, y: -3 },
+    //         tail: Position { x: 2, y: -4 },
+    //     };
+    //     assert_eq!(
+    //         navigate(
+    //             starting_positions,
+    //             vec!(Movement {
+    //                 direction: Direction::DOWN,
+    //                 distance: 1
+    //             })
+    //         ).end,
+    //         expected
+    //     );
+    // }
+    //
+    // #[test]
+    // fn test_all_moves() {
+    //     let starting_positions = Rope {
+    //         head: Position { x: 0, y: 0 },
+    //         tail: Position { x: 0, y: 0 },
+    //     };
+    //     let expected = Rope {
+    //         head: Position { x: 2, y: -2 },
+    //         tail: Position { x: 1, y: -2 },
+    //     };
+    //     let moves = vec!(
+    //         Movement{direction: Direction::RIGHT, distance: 4},
+    //         Movement{direction: Direction::UP, distance: 4},
+    //         Movement{direction: Direction::LEFT, distance: 3},
+    //         Movement{direction: Direction::DOWN, distance: 1},
+    //         Movement{direction: Direction::RIGHT, distance: 4},
+    //         Movement{direction: Direction::DOWN, distance: 1},
+    //         Movement{direction: Direction::LEFT, distance: 5},
+    //         Movement{direction: Direction::RIGHT, distance: 2},
+    //     );
+    //     let result = navigate(
+    //         starting_positions,
+    //         moves
+    //     );
+    //     assert_eq!(result.start, starting_positions);
+    //     assert_eq!(result.end, expected);
+    //     assert_eq!(result.visited.len(), 25);
+    // }
+    //
+    // #[test]
+    // fn acceptance_test() {
+    //     let moves = "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2";
+    //     let locations_visited =count_visited(moves.to_string());
+    //     assert_eq!(locations_visited, 13);
+    // }
 }
