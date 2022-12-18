@@ -44,7 +44,7 @@ pub fn parse(input: String) -> Vec<Movement> {
     result
 }
 
-fn move_head(start: Positions, direction: Direction) -> Positions {
+fn move_one_step(start: Positions, direction: Direction) -> Positions {
     let head_position = match direction {
         Direction::RIGHT => Position {
             x: start.head.x + 1,
@@ -53,6 +53,14 @@ fn move_head(start: Positions, direction: Direction) -> Positions {
         Direction::UP => Position {
             x: start.head.x,
             y: start.head.y - 1,
+        },
+        Direction::LEFT => Position {
+            x: start.head.x-1,
+            y: start.head.y,
+        },
+        Direction::DOWN => Position {
+            x: start.head.x,
+            y: start.head.y+1,
         },
         _ => start.head,
     };
@@ -100,7 +108,13 @@ fn move_head(start: Positions, direction: Direction) -> Positions {
 }
 
 pub fn navigate(start: Positions, movements: Vec<Movement>) -> Positions {
-    move_head(start, movements.get(0).unwrap().direction)
+    let mut positions = start;
+    for movement in movements {
+        for _ in 0..movement.distance {
+            positions = move_one_step(positions, movement.direction);
+        }
+    }
+    positions
 }
 
 #[cfg(test)]
@@ -262,6 +276,167 @@ mod day9_tests {
                     direction: Direction::UP,
                     distance: 1
                 })
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_third_move_up() {
+        let starting_positions = Positions {
+            head: Position { x: 4, y: -2 },
+            tail: Position { x: 4, y: -1 },
+        };
+        let expected = Positions {
+            head: Position { x: 4, y: -3 },
+            tail: Position { x: 4, y: -2 },
+        };
+        assert_eq!(
+            navigate(
+                starting_positions,
+                vec!(Movement {
+                    direction: Direction::UP,
+                    distance: 1
+                })
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_fourth_move_up() {
+        let starting_positions = Positions {
+            head: Position { x: 4, y: -3 },
+            tail: Position { x: 4, y: -2 },
+        };
+        let expected = Positions {
+            head: Position { x: 4, y: -4 },
+            tail: Position { x: 4, y: -3 },
+        };
+        assert_eq!(
+            navigate(
+                starting_positions,
+                vec!(Movement {
+                    direction: Direction::UP,
+                    distance: 1
+                })
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_first_move_left() {
+        let starting_positions = Positions {
+            head: Position { x: 4, y: -4 },
+            tail: Position { x: 4, y: -3 },
+        };
+        let expected = Positions {
+            head: Position { x: 3, y: -4 },
+            tail: Position { x: 4, y: -3 },
+        };
+        assert_eq!(
+            navigate(
+                starting_positions,
+                vec!(Movement {
+                    direction: Direction::LEFT,
+                    distance: 1
+                })
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_second_move_left() {
+        let starting_positions = Positions {
+            head: Position { x: 3, y: -4 },
+            tail: Position { x: 4, y: -3 },
+        };
+        let expected = Positions {
+            head: Position { x: 2, y: -4 },
+            tail: Position { x: 3, y: -4 },
+        };
+        assert_eq!(
+            navigate(
+                starting_positions,
+                vec!(Movement {
+                    direction: Direction::LEFT,
+                    distance: 1
+                })
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_third_move_left() {
+        let starting_positions = Positions {
+            head: Position { x: 2, y: -4 },
+            tail: Position { x: 3, y: -4 },
+        };
+        let expected = Positions {
+            head: Position { x: 1, y: -4 },
+            tail: Position { x: 2, y: -4 },
+        };
+        assert_eq!(
+            navigate(
+                starting_positions,
+                vec!(Movement {
+                    direction: Direction::LEFT,
+                    distance: 1
+                })
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_first_move_down() {
+        let starting_positions = Positions {
+            head: Position { x: 1, y: -4 },
+            tail: Position { x: 2, y: -4 },
+        };
+        let expected = Positions {
+            head: Position { x: 1, y: -3 },
+            tail: Position { x: 2, y: -4 },
+        };
+        assert_eq!(
+            navigate(
+                starting_positions,
+                vec!(Movement {
+                    direction: Direction::DOWN,
+                    distance: 1
+                })
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_all_moves() {
+        let starting_positions = Positions {
+            head: Position { x: 0, y: 0 },
+            tail: Position { x: 0, y: 0 },
+        };
+        let expected = Positions {
+            head: Position { x: 2, y: -2 },
+            tail: Position { x: 1, y: -2 },
+        };
+        let moves = vec!(
+            Movement{direction: Direction::RIGHT, distance: 4},
+            Movement{direction: Direction::UP, distance: 4},
+            Movement{direction: Direction::LEFT, distance: 3},
+            Movement{direction: Direction::DOWN, distance: 1},
+            Movement{direction: Direction::RIGHT, distance: 4},
+            Movement{direction: Direction::DOWN, distance: 1},
+            Movement{direction: Direction::LEFT, distance: 5},
+            Movement{direction: Direction::RIGHT, distance: 2},
+        );
+        assert_eq!(
+            navigate(
+                starting_positions,
+                moves
             ),
             expected
         );
