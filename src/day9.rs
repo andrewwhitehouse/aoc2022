@@ -49,18 +49,22 @@ fn move_head(start: Positions, direction: Direction) -> Positions {
     };
 
     let tail_position = &start.tail.clone();
-    let mut new_tail_position = start.tail;
-    // Check if tail is two steps away
-    if head_position.y == tail_position.y && head_position.x.abs_diff(tail_position.x) == 2
-    || head_position.x == tail_position.x && head_position.y.abs_diff(tail_position.y) == 2 {
-        new_tail_position = Position{x: (head_position.x+tail_position.x)/2, y: (head_position.y+tail_position.y)/2};
+    if head_position.y.abs_diff(tail_position.y) <= 1 && head_position.x.abs_diff(tail_position.x) <= 1 {
+        Positions{head: head_position, tail: start.tail}
     } else {
-        let x_change = if head_position.x > tail_position.x { 1 } else { -1 };
-        let y_change = if head_position.y > tail_position.y { 1 } else { -1 };
-        new_tail_position = Position{x: tail_position.x+x_change, y: tail_position.y+y_change};
-    }
+        let mut new_tail_position = start.tail;
+        // Check if tail is two steps away
+        if head_position.y == tail_position.y && head_position.x.abs_diff(tail_position.x) == 2
+            || head_position.x == tail_position.x && head_position.y.abs_diff(tail_position.y) == 2 {
+            new_tail_position = Position{x: (head_position.x+tail_position.x)/2, y: (head_position.y+tail_position.y)/2};
+        } else {
+            let x_change = if head_position.x > tail_position.x { 1 } else { -1 };
+            let y_change = if head_position.y > tail_position.y { 1 } else { -1 };
+            new_tail_position = Position{x: tail_position.x+x_change, y: tail_position.y+y_change};
+        }
 
-    Positions{head: head_position, tail: new_tail_position}
+        Positions{head: head_position, tail: new_tail_position}
+    }
 }
 
 pub fn navigate(start: Positions, movements: Vec<Movement>) -> Positions {
