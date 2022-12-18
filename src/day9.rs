@@ -12,16 +12,23 @@ pub struct Movement {
     distance: u32,
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub struct Position {
     x: i32,
     y: i32,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub struct Positions {
     head: Position,
     tail: Position,
+}
+
+#[derive(PartialEq, Debug)]
+pub struct Journey {
+    start: Positions,
+    end: Positions,
+    visited: Vec<Positions>
 }
 
 pub fn parse(input: String) -> Vec<Movement> {
@@ -107,14 +114,16 @@ fn move_one_step(start: Positions, direction: Direction) -> Positions {
     }
 }
 
-pub fn navigate(start: Positions, movements: Vec<Movement>) -> Positions {
-    let mut positions = start;
+pub fn navigate(start: Positions, movements: Vec<Movement>) -> Journey {
+    let mut positions = start.clone();
+    let mut visited = vec!(start);
     for movement in movements {
         for _ in 0..movement.distance {
             positions = move_one_step(positions, movement.direction);
+            visited.push(positions);
         }
     }
-    positions
+    Journey{start: start, end: positions, visited: visited}
 }
 
 #[cfg(test)]
@@ -166,7 +175,7 @@ mod day9_tests {
                     direction: Direction::RIGHT,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -188,7 +197,7 @@ mod day9_tests {
                     direction: Direction::RIGHT,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -210,7 +219,7 @@ mod day9_tests {
                     direction: Direction::RIGHT,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -232,7 +241,7 @@ mod day9_tests {
                     direction: Direction::RIGHT,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -254,7 +263,7 @@ mod day9_tests {
                     direction: Direction::UP,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -276,7 +285,7 @@ mod day9_tests {
                     direction: Direction::UP,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -298,7 +307,7 @@ mod day9_tests {
                     direction: Direction::UP,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -320,7 +329,7 @@ mod day9_tests {
                     direction: Direction::UP,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -342,7 +351,7 @@ mod day9_tests {
                     direction: Direction::LEFT,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -364,7 +373,7 @@ mod day9_tests {
                     direction: Direction::LEFT,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -386,7 +395,7 @@ mod day9_tests {
                     direction: Direction::LEFT,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -408,7 +417,7 @@ mod day9_tests {
                     direction: Direction::DOWN,
                     distance: 1
                 })
-            ),
+            ).end,
             expected
         );
     }
@@ -433,12 +442,12 @@ mod day9_tests {
             Movement{direction: Direction::LEFT, distance: 5},
             Movement{direction: Direction::RIGHT, distance: 2},
         );
-        assert_eq!(
-            navigate(
-                starting_positions,
-                moves
-            ),
-            expected
+        let result = navigate(
+            starting_positions,
+            moves
         );
+        assert_eq!(result.start, starting_positions);
+        assert_eq!(result.end, expected);
+        assert_eq!(result.visited.len(), 25);
     }
 }
