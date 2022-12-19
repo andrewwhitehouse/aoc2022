@@ -139,6 +139,46 @@ pub fn count_visited_part2(input: String) -> u32 {
     count_visited(input, 10)
 }
 
+pub fn print_visited(input: String, knot_count: u32) {
+    let moves = parse(input);
+    let mut initial = Vec::new();
+    for _ in 0..knot_count {
+        initial.push(Position{x:0, y:0});
+    }
+    let tail_visited = navigate(Rope{knots: initial}, moves);
+    let mut top_left = Position { x: 0, y: 0 };
+    let mut bottom_right = Position { x: 0, y: 0 };
+    for visited in tail_visited.clone() {
+        if visited.x < top_left.x {
+            top_left.x = visited.x;
+        }
+        if visited.y < top_left.y {
+            top_left.y = visited.y;
+        }
+        if visited.x > bottom_right.x {
+            bottom_right.x = visited.x;
+        }
+        if visited.y > bottom_right.y {
+            bottom_right.y = visited.y;
+        }
+    }
+    let height = bottom_right.y - top_left.y;
+    let width = bottom_right.x - top_left.x;
+    let x_offset = -top_left.x;
+    let y_offset = -top_left.y;
+    let mut normalised = HashSet::new();
+    for position in tail_visited {
+        normalised.insert(Position{x:position.x+x_offset, y:position.y+y_offset });
+    }
+    for y in 0..height {
+        for x in 0..width {
+            let pos = Position{x: x, y: y};
+            print!("{}", if normalised.contains(&pos) {"#"} else {"."});
+        }
+        println!();
+    }
+}
+
 #[cfg(test)]
 mod day9_tests {
     use super::*;
