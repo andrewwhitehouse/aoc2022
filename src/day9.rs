@@ -170,8 +170,8 @@ pub fn print_visited(input: String, knot_count: u32) {
     for position in tail_visited {
         normalised.insert(Position{x:position.x+x_offset, y:position.y+y_offset });
     }
-    for y in 0..height {
-        for x in 0..width {
+    for y in 0..=height {
+        for x in 0..=width {
             let pos = Position{x: x, y: y};
             print!("{}", if normalised.contains(&pos) {"#"} else {"."});
         }
