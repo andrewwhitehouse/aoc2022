@@ -1,13 +1,30 @@
-use std::option::*;
-
+#[derive(PartialEq, Debug)]
 pub enum InstructionType {
     ADDX,
     NOOP
 }
 
+#[derive(PartialEq, Debug)]
 pub struct Instruction {
     instruction_type: InstructionType,
     parmeter: Option<i32>
+}
+
+pub fn parse(input: String) -> Vec<Instruction> {
+    let mut result = Vec::new();
+    for line in input.trim_end().split("\n") {
+        let parts: Vec<&str> = line.split(" ").collect();
+        match parts[0] {
+            "addx" => result.push(Instruction{
+                instruction_type: InstructionType::ADDX,
+                parmeter: Some(parts[1].parse::<i32>().unwrap())}),
+            "noop" => result.push(Instruction{
+                instruction_type: InstructionType::NOOP,
+                parmeter: None}),
+            _ => panic!("Unrecognised instruction {}", line)
+        };
+    }
+    result
 }
 
 pub fn execute(instructions: Vec<Instruction>, sample_at_cycle: Vec<u32>) -> Vec<i32> {
@@ -44,15 +61,24 @@ pub fn execute(instructions: Vec<Instruction>, sample_at_cycle: Vec<u32>) -> Vec
 mod day10_tests {
     use super::*;
 
-    #[test]
-    fn simple_example() {
-        let instructions = vec!(
+    fn example_instructions() -> Vec<Instruction> {
+        vec!(
             Instruction{instruction_type: InstructionType::NOOP, parmeter: None},
             Instruction{instruction_type: InstructionType::ADDX, parmeter: Some(3)},
             Instruction{instruction_type: InstructionType::ADDX, parmeter: Some(-5)},
-        );
-        let result = execute(instructions, (1..=6).collect());
+        )
+    }
+
+    #[test]
+    fn simple_example() {
+        let result = execute(example_instructions(), (1..=6).collect());
         assert_eq!(result, vec!(1, 1, 1, 4, 4, -1));
+    }
+
+    #[test]
+    fn simple_parse() {
+        let input = "noop\naddx 3\naddx -5\n";
+        assert_eq!(parse(input.to_string()), example_instructions());
     }
 }
 

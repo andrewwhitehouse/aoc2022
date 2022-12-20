@@ -139,6 +139,7 @@ pub fn count_visited_part2(input: String) -> u32 {
     count_visited(input, 10)
 }
 
+#[warn(dead_code)]
 pub fn print_visited(input: String, knot_count: u32) {
     let moves = parse(input);
     let mut initial = Vec::new();
