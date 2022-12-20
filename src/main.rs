@@ -69,6 +69,11 @@ fn solve_day9() {
     //day9::print_visited(input, 10);
 }
 
+fn solve_day10() {
+    let input = read_file("input/day10.txt");
+    println!("Day 10 Part 1 {}", day10::solve_part1(input.clone()));
+}
+
 pub fn main() {
     solve_day1();
     solve_day2();
@@ -78,4 +83,5 @@ pub fn main() {
     solve_day6();
     solve_day8();
     solve_day9();
+    solve_day10();
 }
