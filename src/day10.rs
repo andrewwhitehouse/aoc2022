@@ -69,6 +69,44 @@ pub fn solve_part1(input: String) -> i32 {
     total
 }
 
+pub fn crt_display(instructions: Vec<Instruction>) -> Vec<String> {
+    let mut x = 1;
+    let mut pixel_position = 0;
+    let mut output: String = String::from("");
+    let mut cycle = 1;
+    for instruction in instructions {
+        let new_x;
+        let cycles_for_instruction = match instruction.instruction_type {
+            InstructionType::NOOP => {
+                new_x = x;
+                1
+            },
+            InstructionType::ADDX => {
+                new_x = x + instruction.parmeter.unwrap();
+                2
+            }
+        };
+        for i in 0..cycles_for_instruction {
+            let col = (cycle - 1) % 40;
+            println!("x {} pixel_position {} col {}", x, pixel_position, col);
+            if x-1 == col || x == col || x+1 == col {
+                output.push_str("#")
+            } else {
+                output.push_str(".");
+            }
+            pixel_position += 1;
+            cycle += 1;
+        }
+        x = new_x;
+    }
+    println!("{}", output);
+    output.chars()
+        .collect::<Vec<char>>()
+        .chunks(40)
+        .map(|c| c.iter().collect::<String>())
+        .collect::<Vec<String>>()
+}
+
 #[cfg(test)]
 mod day10_tests {
     use super::*;
@@ -129,6 +167,20 @@ mod day10_tests {
     #[test]
     fn test_solve_part1_example() {
         assert_eq!(solve_part1(longer_input()), 13140);
+    }
+
+    #[test]
+    fn test_crt_display() {
+        let output = crt_display(parse(longer_input()));
+        let expected = vec!(
+            "##..##..##..##..##..##..##..##..##..##..",
+            "###...###...###...###...###...###...###.",
+            "####....####....####....####....####....",
+            "#####.....#####.....#####.....#####.....",
+            "######......######......######......####",
+            "#######.......#######.......#######....."
+        );
+        assert_eq!(output, expected);
     }
 }
 
