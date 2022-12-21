@@ -69,6 +69,13 @@ pub fn solve_part1(input: String) -> i32 {
     total
 }
 
+pub fn solve_part2(input: String) -> String {
+    let sample_points: Vec<usize> = vec!(20, 60, 100, 140, 180, 220);
+    let instructions = parse(input);
+    let lines = crt_display(instructions);
+    lines.join("\n")
+}
+
 pub fn crt_display(instructions: Vec<Instruction>) -> Vec<String> {
     let mut x = 1;
     let mut pixel_position = 0;
@@ -88,7 +95,6 @@ pub fn crt_display(instructions: Vec<Instruction>) -> Vec<String> {
         };
         for i in 0..cycles_for_instruction {
             let col = (cycle - 1) % 40;
-            println!("x {} pixel_position {} col {}", x, pixel_position, col);
             if x-1 == col || x == col || x+1 == col {
                 output.push_str("#")
             } else {
@@ -99,7 +105,6 @@ pub fn crt_display(instructions: Vec<Instruction>) -> Vec<String> {
         }
         x = new_x;
     }
-    println!("{}", output);
     output.chars()
         .collect::<Vec<char>>()
         .chunks(40)

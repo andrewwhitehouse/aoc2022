@@ -72,6 +72,8 @@ fn solve_day9() {
 fn solve_day10() {
     let input = read_file("input/day10.txt");
     println!("Day 10 Part 1 {}", day10::solve_part1(input.clone()));
+    println!("Day 10 Part 2 ...");
+    println!("{}", day10::solve_part2(input))
 }
 
 pub fn main() {
