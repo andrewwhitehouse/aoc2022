@@ -70,7 +70,6 @@ pub fn solve_part1(input: String) -> i32 {
 }
 
 pub fn solve_part2(input: String) -> String {
-    let sample_points: Vec<usize> = vec!(20, 60, 100, 140, 180, 220);
     let instructions = parse(input);
     let lines = crt_display(instructions);
     lines.join("\n")
@@ -78,7 +77,6 @@ pub fn solve_part2(input: String) -> String {
 
 pub fn crt_display(instructions: Vec<Instruction>) -> Vec<String> {
     let mut x = 1;
-    let mut pixel_position = 0;
     let mut output: String = String::from("");
     let mut cycle = 1;
     for instruction in instructions {
@@ -93,14 +91,13 @@ pub fn crt_display(instructions: Vec<Instruction>) -> Vec<String> {
                 2
             }
         };
-        for i in 0..cycles_for_instruction {
+        for _ in 0..cycles_for_instruction {
             let col = (cycle - 1) % 40;
             if x-1 == col || x == col || x+1 == col {
                 output.push_str("#")
             } else {
                 output.push_str(".");
             }
-            pixel_position += 1;
             cycle += 1;
         }
         x = new_x;
