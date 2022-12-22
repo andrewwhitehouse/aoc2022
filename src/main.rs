@@ -9,6 +9,7 @@ mod day6;
 mod day8;
 mod day9;
 mod day10;
+mod day22;
 
 fn solve_day1() {
     let input = fs::read_to_string("input/day1.txt").expect("failed to read day1 input");
